@@ -3,27 +3,35 @@
         <nav>
             <img src="@/assets/ninja.jpg">
             <h1>
-                <router-link :to="{ name: Home }">Muso Ninjas</router-link>
+                <router-link :to="{ name: 'Home' }">Muso Ninjas</router-link>
             </h1>
             <div class="links">
-                <button>Logout</button>
-                <router-link class="btn" :to="{ name: 'Signup' }">Signup</router-link>
-                <router-link class="btn" :to="{ name: 'Login' }">Log in</router-link>
+                <button @click="handleClick" v-show="user">Logout</button>
+                <router-link v-show="!user" class="btn" :to="{ name: 'Signup' }">Signup</router-link>
+                <router-link v-show="!user" class="btn" :to="{ name: 'Login' }">Log in</router-link>
             </div>
-
         </nav>
     </div>
 </template>
 
 <script>
-import useLogin from '@/composables/useLogin';
-import { ref } from 'vue';
+import useLogout from '@/composables/useLogout';
+import getUser from '@/composables/getUser';
+
+import { useRouter } from 'vue-router';
 export default {
     setup() {
-
-
+        const { logout } = useLogout();
+        const { user } = getUser();
+        const router = useRouter();
+            const handleClick = async () => {
+            await logout();
+            router.push({ name: 'Login' });
+            console.log('user logged out');
+        };
         return {
-
+            handleClick,
+            user
         };
     }
 };
