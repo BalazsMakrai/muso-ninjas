@@ -6,29 +6,53 @@
         <label>Upload playlist cover image</label>
         <input type="file" @change="handleChange">
         <div class="error">{{ fileError }}</div>
-        <button>Create</button>
+        <button v-show="!isPending">Create</button>
+        <button disabled v-show="isPending">Saving...</button>
     </form>
 </template>
 
 <script>
 import { ref } from 'vue';
+import useStorage from '@/composables/useStorage';
+import useCollection from '@/composables/useCollection';
+import getUser from '@/composables/getUser';
+import { timestamp } from '@/firebase/config';
 
 export default {
     setup() {
+        const { url, filePath, uploadImage } = useStorage();
+        const { error, addDoc } = useCollection('playlists');
+        const { user } = getUser();
         const title = ref('');
         const description = ref('');
         const file = ref(null);
         const types = ['image/png', 'image/jpeg'];
         const fileError = ref(null);
-        const handleSubmit = () => {
+        const isPending = ref(false);
+
+        const handleSubmit = async () => {
             if (file.value) {
-                console.log(title.value, description.value, file.value);
+                isPending.value = true;
+                await uploadImage(file.value);
+                await addDoc({
+                    title: title.value,
+                    desc: description.value,
+                    userId: user.value.uid,
+                    userName: user.value.displayName,
+                    coverUrl: url.value,
+                    filePath: filePath.value,
+                    songs: [],
+                    createdAt: timestamp()
+                });
+                isPending.value = false;
+                if (!error.value) {
+                    console.log('Playlist added');
+                }
             }
         };
 
         const handleChange = (e) => {
             const selected = e.target.files[0];
-            console.log(selected);
             if (selected && types.includes(selected.type)) {
                 file.value = selected;
                 fileError.value = null;
@@ -42,7 +66,8 @@ export default {
             description,
             handleSubmit,
             handleChange,
-            fileError
+            fileError,
+            isPending
         };
     }
 };
