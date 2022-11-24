@@ -6,9 +6,14 @@
                 <router-link :to="{ name: 'Home' }">Muso Ninjas</router-link>
             </h1>
             <div class="links">
-                <button @click="handleClick" v-show="user">Logout</button>
-                <router-link v-show="!user" class="btn" :to="{ name: 'Signup' }">Signup</router-link>
-                <router-link v-show="!user" class="btn" :to="{ name: 'Login' }">Log in</router-link>
+                <div v-show="user">
+                    <router-link :to="{ name: 'CreatePlaylist' }">Create playlist</router-link>
+                    <button @click="handleClick">Logout</button>
+                </div>
+                <div v-show="!user">
+                    <router-link class="btn" :to="{ name: 'Signup' }">Signup</router-link>
+                    <router-link class="btn" :to="{ name: 'Login' }">Log in</router-link>
+                </div>
             </div>
         </nav>
     </div>
@@ -24,7 +29,7 @@ export default {
         const { logout } = useLogout();
         const { user } = getUser();
         const router = useRouter();
-            const handleClick = async () => {
+        const handleClick = async () => {
             await logout();
             router.push({ name: 'Login' });
             console.log('user logged out');
