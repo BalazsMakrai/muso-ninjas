@@ -6,11 +6,13 @@
                 <router-link :to="{ name: 'Home' }">Muso Ninjas</router-link>
             </h1>
             <div class="links">
-                <div v-show="user">
+                <div v-if="user">
                     <router-link :to="{ name: 'CreatePlaylist' }">Create playlist</router-link>
+                    <router-link :to="{ name: 'UserPlaylist' }">My playlist</router-link>
+                    <span>Hi here, {{ user.displayName }}</span>
                     <button @click="handleClick">Logout</button>
                 </div>
-                <div v-show="!user">
+                <div v-if="!user">
                     <router-link class="btn" :to="{ name: 'Signup' }">Signup</router-link>
                     <router-link class="btn" :to="{ name: 'Login' }">Log in</router-link>
                 </div>
@@ -72,5 +74,13 @@ button {
 
 nav img {
     max-height: 60px;
+}
+
+span {
+    font-size: 14px;
+    display: inline-block;
+    margin-left: 16px;
+    padding-left: 16px;
+    border-left: 1px solid #eee;
 }
 </style>

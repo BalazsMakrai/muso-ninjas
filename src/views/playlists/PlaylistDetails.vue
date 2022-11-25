@@ -11,7 +11,14 @@
             <button v-if="ownerShip" @click="handleDelete">Delete playlist</button>
         </div>
         <div class="song-list">
-            <p>song list here</p>
+            <div v-if="!document.songs.length">No songs have neen added to this playlist yet</div>
+            <div class="single-song" v-for="song in document.songs" :key="song.id">
+                <div class="details">
+                    <h3>{{ song.title }}</h3>
+                    <p>{{ song.artist }}</p>
+                </div>
+                <button v-if="ownerShip" @click="handleClick(song.id)">Delete</button>
+            </div>
             <AddSong v-if="ownerShip" :playlist="document" />
         </div>
     </div>
@@ -31,7 +38,7 @@ export default {
     components: { AddSong },
     setup(props) {
         const { user } = getUser();
-        const { deleteDoc } = useDocument('playlists', props.id);
+        const { deleteDoc, updateDoc } = useDocument('playlists', props.id);
         const { error, document } = getDocument('playlists', props.id);
         const { deleteImage } = useStorage();
         const router = useRouter();
@@ -45,11 +52,18 @@ export default {
             router.push({ name: 'Home' });
         };
 
+        const handleClick = async (id) => {
+            const songs = document.value.songs.filter(song => song.id != id);
+            await updateDoc({ songs: songs });
+        };
+
         return {
             error,
             document,
             ownerShip,
-            handleDelete
+            handleDelete,
+            handleClick
+
         };
     }
 };
@@ -100,6 +114,15 @@ export default {
 
 .description {
     text-align: left;
+}
+
+.single-song {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--secondary);
+    margin-bottom: 20px;
 }
 </style>
 
